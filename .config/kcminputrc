@@ -1,0 +1,8 @@
+[Libinput][1739][52715][SYNA30A5:00 06CB:CDEB Touchpad]
+NaturalScroll=true
+
+[Libinput\x5d\x5b1739\x5d\x5b52715\x5d\x5bSYNA30A5:00 06CB:CDEB Touchpad]
+NaturalScroll=true
+
+[Mouse]
+cursorTheme=WinSur-dark-cursors

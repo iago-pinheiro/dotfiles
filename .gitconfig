@@ -1,0 +1,15 @@
+[init]
+	defaultBranch = main
+[fetch]
+	prune = true
+[diff]
+	colorMoved = zebra
+[credential "https://github.com"]
+	helper = 
+	helper = !/usr/bin/gh auth git-credential
+[credential "https://gist.github.com"]
+	helper = 
+	helper = !/usr/bin/gh auth git-credential
+[user]
+	name = Iago Pinheiro
+	email = iagoo.pinheiro73@gmail.com

@@ -1,0 +1,145 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+
+  // ============================================================
+  // FASE 2 - MODELOS (gratuitos, provedor "opencode", custo 0 USD)
+  // Principal: deepseek-v4.1-flash-free (correto e rapido nos testes)
+  // Rapido:    beam-free (alternativa p/ tarefas simples, 7-10s)
+  // Troca em sessao com /models ou: opencode run -m <provider/model>
+  // ============================================================
+  "model": "opencode/deepseek-v4.1-flash-free",
+  "default_agent": "build",
+
+  // ============================================================
+  // AMBIENTE
+  // ============================================================
+  "shell": "/bin/bash",
+  "update": "notify",
+  "formatter": true,
+
+  // Protege o contexto em sessoes longas (evita gastar tokens a toa)
+  "compaction": {
+    "auto": true,
+    "keep": { "tokens": 15000 },
+    "buffer": 20000
+  },
+
+  // Evita re-carregar contexto por mudancas em artefatos de build
+  "watcher": {
+    "ignore": [
+      "node_modules/**",
+      "dist/**",
+      "build/**",
+      "coverage/**",
+      ".next/**",
+      ".dart_tool/**",
+      ".git/**",
+      "*.log"
+    ]
+  },
+
+  // ============================================================
+  // FASE 3/6 - PERMISSOES (a ultima regra que casa vence)
+  // Base do OpenCode ja e "* allow"; abaixo vem as excecoes.
+  // ============================================================
+  "permissions": [
+    // --- segredos e credenciais ---------------------------------
+    { "action": "edit", "resource": "*.env", "effect": "deny" },
+    { "action": "edit", "resource": "*.env.*", "effect": "deny" },
+    { "action": "edit", "resource": "*.env.example", "effect": "allow" },
+    { "action": "edit", "resource": "**/.env", "effect": "deny" },
+    { "action": "edit", "resource": "**/.env.*", "effect": "deny" },
+    { "action": "read", "resource": "**/.ssh/*", "effect": "ask" },
+    { "action": "read", "resource": "**/.ssh/**", "effect": "ask" },
+    { "action": "edit", "resource": "**/.git/*", "effect": "deny" },
+    { "action": "edit", "resource": "**/.git/**", "effect": "deny" },
+
+    // --- acesso fora do projeto: supervisionado ------------------
+    { "action": "external_directory", "resource": "*", "effect": "ask" },
+
+    // --- git: remotas ou destrutivas exigem confirmacao ----------
+    { "action": "shell", "resource": "git push", "effect": "ask" },
+    { "action": "shell", "resource": "git push *", "effect": "ask" },
+    { "action": "shell", "resource": "git merge", "effect": "ask" },
+    { "action": "shell", "resource": "git merge *", "effect": "ask" },
+    { "action": "shell", "resource": "git rebase *", "effect": "ask" },
+    { "action": "shell", "resource": "git reset", "effect": "ask" },
+    { "action": "shell", "resource": "git reset *", "effect": "ask" },
+    { "action": "shell", "resource": "git clean *", "effect": "ask" },
+    { "action": "shell", "resource": "git restore *", "effect": "ask" },
+    { "action": "shell", "resource": "git checkout -- *", "effect": "ask" },
+    { "action": "shell", "resource": "git branch -d *", "effect": "ask" },
+    { "action": "shell", "resource": "git branch -D *", "effect": "ask" },
+    { "action": "shell", "resource": "git branch -m *", "effect": "ask" },
+    { "action": "shell", "resource": "git remote remove *", "effect": "ask" },
+    { "action": "shell", "resource": "git remote set-url *", "effect": "ask" },
+    { "action": "shell", "resource": "git update-ref *", "effect": "ask" },
+    { "action": "shell", "resource": "git filter-branch *", "effect": "ask" },
+    { "action": "shell", "resource": "git stash drop *", "effect": "ask" },
+
+    // --- github cli: escrita remota exige confirmacao ------------
+    { "action": "shell", "resource": "gh api *", "effect": "ask" },
+    { "action": "shell", "resource": "gh auth *", "effect": "ask" },
+    { "action": "shell", "resource": "gh pr create *", "effect": "ask" },
+    { "action": "shell", "resource": "gh pr merge *", "effect": "ask" },
+    { "action": "shell", "resource": "gh pr close *", "effect": "ask" },
+    { "action": "shell", "resource": "gh pr edit *", "effect": "ask" },
+    { "action": "shell", "resource": "gh pr delete *", "effect": "ask" },
+    { "action": "shell", "resource": "gh pr ready *", "effect": "ask" },
+    { "action": "shell", "resource": "gh pr review *", "effect": "ask" },
+    { "action": "shell", "resource": "gh issue create *", "effect": "ask" },
+    { "action": "shell", "resource": "gh issue close *", "effect": "ask" },
+    { "action": "shell", "resource": "gh issue edit *", "effect": "ask" },
+    { "action": "shell", "resource": "gh issue delete *", "effect": "ask" },
+    { "action": "shell", "resource": "gh repo delete *", "effect": "ask" },
+    { "action": "shell", "resource": "gh repo edit *", "effect": "ask" },
+    { "action": "shell", "resource": "gh release *", "effect": "ask" },
+    { "action": "shell", "resource": "gh workflow *", "effect": "ask" },
+    { "action": "shell", "resource": "gh run delete *", "effect": "ask" },
+    { "action": "shell", "resource": "gh run cancel *", "effect": "ask" },
+
+    // --- destrutivas do sistema / privilegiadas ------------------
+    { "action": "shell", "resource": "sudo *", "effect": "ask" },
+    { "action": "shell", "resource": "su *", "effect": "ask" },
+    { "action": "shell", "resource": "rm *", "effect": "ask" },
+    { "action": "shell", "resource": "dd *", "effect": "ask" },
+    { "action": "shell", "resource": "mkfs *", "effect": "ask" },
+    { "action": "shell", "resource": "mkfs.*", "effect": "ask" },
+    { "action": "shell", "resource": "curl * | *", "effect": "ask" },
+    { "action": "shell", "resource": "wget * | *", "effect": "ask" },
+
+    // --- publicacao em registros externos ------------------------
+    { "action": "shell", "resource": "npm publish *", "effect": "ask" },
+    { "action": "shell", "resource": "npm unpublish *", "effect": "ask" },
+    { "action": "shell", "resource": "pip publish *", "effect": "ask" },
+    { "action": "shell", "resource": "flutter publish *", "effect": "ask" },
+    { "action": "shell", "resource": "dart pub publish *", "effect": "ask" }
+  ],
+
+  // ============================================================
+  // FASE 4 - MCP
+  // playwright: oficial da Microsoft, tools nativas (codemode:false
+  //   para que screenshots cheguem como imagem ao modelo)
+  //
+  // O GitHub MCP REMOTO (api.githubcopilot.com/mcp/) foi testado e
+  // REMOVIDO: o GitHub nao publica metadados de authorization server
+  // nem endpoint de dynamic client registration, entao o OAuth do
+  // OpenCode falha com "Incompatible auth server: does not support
+  // dynamic client registration". A solucao aprovada e usar o
+  // GitHub CLI (gh), ja autenticado via navegador, com as regras de
+  // permissao abaixo exigindo confirmacao em push/merge/gh api.
+  // ============================================================
+  "mcp": {
+    "servers": {
+      "playwright": {
+        "type": "local",
+        "command": ["/home/iago/.config/opencode/bin/playwright-mcp"],
+        "codemode": false,
+        "timeout": {
+          "startup": 90000,
+          "catalog": 30000
+        }
+      }
+    }
+  }
+}

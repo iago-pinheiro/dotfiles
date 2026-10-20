@@ -1,0 +1,27 @@
+# Gerado por accent-sync.py — não edite à mão.
+# Tema do Ghostty derivado da cor de destaque do Plasma (#D38539).
+# Regerar: ~/.local/share/kde-rice/accent-sync.py
+
+background = #171310
+foreground = #E3E0DE
+cursor-color = #D38539
+cursor-text = #171310
+selection-background = #554230
+selection-foreground = #F3F2F1
+
+palette = 0=#312921
+palette = 1=#CF6D59
+palette = 2=#94C760
+palette = 3=#D3B269
+palette = 4=#D38539
+palette = 5=#CF6E9D
+palette = 6=#64C477
+palette = 7=#D6D1CD
+palette = 8=#665647
+palette = 9=#E09485
+palette = 10=#B3DA8B
+palette = 11=#E4CC95
+palette = 12=#E0A973
+palette = 13=#E198BC
+palette = 14=#8CD99C
+palette = 15=#F5F5F4

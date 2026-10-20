@@ -1,0 +1,94 @@
+# Manifest — única fonte de verdade do que entra/sai do repositório.
+#
+# Uma linha por caminho, sempre relativo ao seu $HOME. O repositório espelha o
+# $HOME na raiz (ex.: .config/ghostty/config -> ~/.config/ghostty/config).
+#
+#   save.sh     -> $HOME/<caminho>  =>  <repo>/<caminho>
+#   install.sh  -> <repo>/<caminho> =>  $HOME/<caminho>
+#
+# Linhas em branco e linhas iniciadas por # são ignoradas.
+# Caminhos de diretório são copiados recursivamente.
+#
+# ATENÇÃO: nada de segredos aqui (tokens, chaves, senhas, dados de navegador).
+
+# ---------------------------------------------------------------- home (~)
+.zshrc
+.bashrc
+.bash_profile
+.bash_logout
+.gtkrc-2.0
+.gitconfig
+
+# ---------------------------------------------------------------- KDE Plasma / KWin
+.config/kdeglobals
+.config/kwinrc
+.config/kwinrulesrc
+.config/kwinoutputconfig.json
+.config/kglobalshortcutsrc
+.config/kcminputrc
+.config/kscreenlockerrc
+.config/plasmarc
+.config/plasmashellrc
+.config/plasmanotifyrc
+.config/ksmserverrc
+.config/kaccessrc
+.config/kded6rc
+.config/kdedefaults
+.config/kconf_updaterc
+.config/powermanagementprofilesrc
+.config/systemmonitorrc
+.config/ktimezonedrc
+.config/kwalletrc
+.config/kactivitymanagerdrc
+.config/plasma-localerc
+.config/baloofilerc
+.config/plasma-org.kde.plasma.desktop-appletsrc
+
+# ---------------------------------------------------------------- apps
+.config/ghostty
+.config/fastfetch
+.config/kremarc
+.config/klassy
+.config/micro/bindings.json
+.config/micro/colorschemes
+.config/micro/settings.json
+.config/ulauncher
+.config/fish/config.fish
+.config/kate
+.config/katerc
+.config/katevirc
+.config/kate-externaltoolspluginrc
+.config/dolphinrc
+.config/arkrc
+.config/konsolerc
+.config/konsolesshconfig
+.config/flameshot
+.config/spectaclerc
+.config/shelly
+.config/gtk-3.0
+.config/gtk-4.0
+.config/autostart/org.flameshot.Flameshot.desktop
+.config/systemd/user/app-com.mitchellh.ghostty.service.d/im.conf
+
+# ---------------------------------------------------------------- OpenCode (agentes/skills)
+# service.json (senha do servidor local) fica FORA do repositório de propósito.
+.config/opencode/AGENTS.md
+.config/opencode/opencode.jsonc
+.config/opencode/agents
+.config/opencode/skills
+.config/opencode/bin
+
+# ---------------------------------------------------------------- ~/.local
+.local/bin/wallpaper-switcher
+.local/share/applications/wallpaper-switcher.desktop
+.local/share/kde-rice
+.local/share/applications/braveweb.desktop
+.local/share/color-schemes
+.local/share/aurorae/themes/Utterly-Round-Dark
+
+# ---------------------------------------------------------------- ambiente de trabalho
+.config/mimeapps.list
+.config/user-dirs.dirs
+.config/user-dirs.locale
+.config/xsettingsd
+.config/libinput-gestures.conf

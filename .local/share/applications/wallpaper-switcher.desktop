@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Trocar wallpaper
+Comment=Troca o papel de parede e sincroniza a cor de destaque
+Exec=sh -c "exec \$HOME/.local/bin/wallpaper-switcher"
+Icon=preferences-desktop-wallpaper
+Terminal=false
+StartupNotify=false
+Categories=Settings;DesktopSettings;
+X-KDE-GlobalAccel-CommandShortcut=true

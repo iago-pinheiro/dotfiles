@@ -1,0 +1,28 @@
+# ---- backups locais (não versionar) ----
+*.bak
+*.bak-*
+*.backup
+*.orig
+*~
+
+# ---- segredos: nunca subir ----
+.config/opencode/service.json
+.config/gh/*/hosts.yml
+.netrc
+.npmrc
+.config/kdeconnect/
+.ssh/
+.gnupg/
+*.pem
+*.key
+*.kdbx
+
+# ---- lixo de runtime ----
+.config/micro/buffers/
+.config/micro/backups/
+.cache/
+.local/share/Trash/
+*.log
+
+# estado gerado do fish (recriado no login)
+.config/fish/fish_variables

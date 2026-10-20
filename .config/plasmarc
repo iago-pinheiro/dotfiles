@@ -1,0 +1,8 @@
+[OSD]
+kbdLayoutChangedEnabled=false
+
+[Theme]
+name=klassy-dark
+
+[Wallpapers]
+usersWallpapers=$HOME/Pictures/light.png

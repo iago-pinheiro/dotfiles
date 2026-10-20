@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# Wrapper do Playwright MCP para o OpenCode.
+# Resolve dinamicamente o executavel do Chromium instalado pelo Playwright,
+# para que o MCP nao dependa do Google Chrome do sistema nem de um caminho
+# fixo de versao. Recriado/ajustado sem tocar no opencode.jsonc.
+set -euo pipefail
+
+BROWSERS_DIR="${PLAYWRIGHT_BROWSERS_PATH:-$HOME/.cache/ms-playwright}"
+
+# chrome-linux64 (playwright >= 1.5x) ou chrome-linux (layouts antigos)
+CHROME="$(find "$BROWSERS_DIR" -maxdepth 3 -type f \
+  -path '*/chromium-*/chrome-linux*/chrome' 2>/dev/null | sort -V | tail -1)"
+
+if [ -z "${CHROME:-}" ] || [ ! -x "$CHROME" ]; then
+  echo "[playwright-mcp] Chromium nao encontrado em $BROWSERS_DIR." >&2
+  echo "[playwright-mcp] Instale com: npx -y playwright install chromium" >&2
+  exit 1
+fi
+
+# - headless: nao abre janelas na area de trabalho
+# - isolated: perfil em memoria, nada de cookies/sessao persistindo em disco
+# - caps vision: habilita screenshot (necessario para verificacao de UI)
+exec npx -y @playwright/mcp@latest \
+  --headless \
+  --isolated \
+  --caps vision \
+  --executable-path "$CHROME" \
+  "$@"

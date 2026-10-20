@@ -1,0 +1,6 @@
+artcraft-launcher
+klassy
+krema
+kwin-scripts-krohnkite-git
+plasma6-applets-panel-colorizer
+ulauncher

@@ -1,0 +1,91 @@
+#!/usr/bin/env bash
+# wallpaper-switcher — troca o wallpaper pelo seletor nativo do KDE e sincroniza
+# a cor de destaque (Ghostty, fastfetch e barra superior).
+#
+# Uso: wallpaper-switcher [pasta-de-imagens]
+# - Não modifica as imagens originais (só lê).
+# - Aplica o wallpaper via plasma-apply-wallpaperimage (API do Plasma 6).
+# - Usa o kdialog (nativo do KDE) para escolher a imagem.
+# - Depois chama accent-sync.py (tema do Ghostty + realces do fastfetch) e
+#   panel-colorizer.py (barra superior).
+set -u
+
+DIR="${1:-$HOME/Imagens/Wallpapers}"
+GK="$HOME/.config/kdeglobals"
+
+err() {
+  printf '\033[1;31mwallpaper-switcher:\033[0m %s\n' "$*" >&2
+  kdialog --title "Wallpaper" --passivepopup "$*" 5 2>/dev/null || true
+  exit 1
+}
+
+command -v kdialog >/dev/null 2>&1 || err "kdialog não encontrado (pacote kdialog)"
+command -v plasma-apply-wallpaperimage >/dev/null 2>&1 \
+  || err "plasma-apply-wallpaperimage ausente (plasma-workspace não instalado?)"
+[ -d "$DIR" ] || err "pasta inexistente: $DIR"
+
+# ---- 1) seletor nativo do KDE (abre já na pasta de wallpapers) ----
+FILE="$(kdialog --title 'Trocar wallpaper' --getopenfilename "$DIR" \
+  'Imagens (*.png *.jpg *.jpeg *.webp *.bmp *.avif)' 2>/dev/null)" || exit 0
+[ -n "$FILE" ] || exit 0   # cancelou
+[ -f "$FILE" ] || err "arquivo inválido: $FILE"
+
+# ---- 2) aplica o wallpaper (não toca no arquivo original) ----
+plasma-apply-wallpaperimage "$FILE" >/dev/null 2>&1 \
+  || err "falha ao aplicar wallpaper: $FILE"
+
+# ---- 3) cor de destaque: tenta o recurso nativo do Plasma 6 ----
+kwriteconfig6 --file kdeglobals --group General --key AccentColorFromWallpaper true \
+  2>/dev/null || true
+sleep 2
+accent="$(kreadconfig6 --file kdeglobals --group General --key AccentColor 2>/dev/null || true)"
+
+if [ -z "$accent" ]; then
+  # fallback: extrai a cor dominante da imagem (sem alterá-la)
+  command -v magick >/dev/null 2>&1 || err "sem destaque definido e ImageMagick ausente"
+  hex="$(magick "$FILE" -auto-orient -resize '80x80^' -gravity center -extent 80x80 \
+      -colors 16 -depth 8 -format %c histogram:info:- 2>/dev/null \
+    | python3 -c '
+import sys, re
+best = None
+for line in sys.stdin:
+    m = re.search(r"#([0-9A-Fa-f]{6})", line)
+    c = re.match(r"\s*(\d+):", line)
+    if not m or not c:
+        continue
+    h, n = m.group(1), int(c.group(1))
+    r, g, b = (int(h[i:i+2], 16) for i in (0, 2, 4))
+    mx, mn = max(r, g, b), min(r, g, b)
+    if mx < 45 or mn > 230:      # ignora quase-preto / quase-branco
+        continue
+    sat = 0 if mx == 0 else (mx - mn) / mx
+    if sat < 0.18:               # ignora cinzas
+        continue
+    score = n * (0.4 + sat)
+    if best is None or score > best[0]:
+        best = (score, h)
+print("#" + best[1].upper() if best else "")
+')"
+  [ -n "$hex" ] || hex="#4F9CF9"  # fallback final
+  scheme="$(kreadconfig6 --file kdeglobals --group General --key ColorScheme 2>/dev/null || echo BreezeDark)"
+  plasma-apply-colorscheme "$scheme" -a "$hex" >/dev/null 2>&1 || true
+  accent="$hex"
+else
+  # formato nativo é "r,g,b" decimal → converte para #RRGGBB
+  case "$accent" in
+    '#'*) ;;
+    *) accent="$(printf '#%02X%02X%02X' $(echo "$accent" | tr ',' ' '))" ;;
+  esac
+fi
+
+# ---- 4) leva o destaque para o terminal (Ghostty) e o fastfetch ----
+# A borda da barra superior não precisa disso: o Panel Colorizer usa a fonte
+# "System" (focusColor = cor de destaque), que acompanha ao vivo.
+accent_sync="$HOME/.local/share/kde-rice/accent-sync.py"
+if [ -f "$accent_sync" ]; then
+  python3 "$accent_sync" >/dev/null 2>&1 || true
+fi
+
+msg="Wallpaper: $(basename "$FILE") — destaque $accent"
+kdialog --title 'Wallpaper' --passivepopup "$msg" 5 2>/dev/null \
+  || notify-send -t 5000 'Wallpaper' "$msg" 2>/dev/null || true
